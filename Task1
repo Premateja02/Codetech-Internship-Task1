@@ -1,0 +1,61 @@
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+
+public class PasswordStrengthChecker {
+    
+    public static int assessPasswordStrength(String password) {
+        int score = 0;
+        
+        // Length check
+        int length = password.length();
+        if (length >= 8) score++;
+        if (length >= 12) score++;
+        if (length >= 16) score++;
+        
+        // Complexity check
+        if (Pattern.compile("[a-z]").matcher(password).find()) score++;
+        if (Pattern.compile("[A-Z]").matcher(password).find()) score++;
+        if (Pattern.compile("\\d").matcher(password).find()) score++;
+        if (Pattern.compile("[^a-zA-Z0-9]").matcher(password).find()) score++;
+        
+        // Uniqueness check
+        List<String> commonPasswords = Arrays.asList("password", "123456", "12345678", "abc123", "qwerty");
+        if (!commonPasswords.contains(password.toLowerCase())) score++;
+        
+        return score;
+    }
+    
+    public static String[] provideFeedback(String password) {
+        int score = assessPasswordStrength(password);
+        List<String> feedback = new ArrayList<>();
+        
+        int length = password.length();
+        if (length < 8) feedback.add("Password is too short. Use at least 8 characters.");
+        if (!Pattern.compile("[a-z]").matcher(password).find()) feedback.add("Add lowercase letters.");
+        if (!Pattern.compile("[A-Z]").matcher(password).find()) feedback.add("Add uppercase letters.");
+        if (!Pattern.compile("\\d").matcher(password).find()) feedback.add("Add numbers.");
+        if (!Pattern.compile("[^a-zA-Z0-9]").matcher(password).find()) feedback.add("Add special characters.");
+        
+        List<String> commonPasswords = Arrays.asList("password", "123456", "12345678", "abc123", "qwerty");
+        if (commonPasswords.contains(password.toLowerCase())) feedback.add("Avoid common passwords.");
+        
+        if (score <= 3) feedback.add("Password is weak.");
+        else if (score <= 6) feedback.add("Password is moderate.");
+        else feedback.add("Password is strong.");
+        
+        return feedback.toArray(new String[0]);
+    }
+    
+    public static void main(String[] args) {
+        String password = "P@ssw0rd123";
+        int score = assessPasswordStrength(password);
+        String[] feedback = provideFeedback(password);
+        
+        System.out.println("Password Score: " + score);
+        System.out.println("Feedback:");
+        for (String comment : feedback) {
+            System.out.println("- " + comment);
+        }
+    }
+}
